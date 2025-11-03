@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glacier-bg"></div>
+  <div class="snow-container"></div>
+  <label class="toggle-switch" style="position:fixed;top:20px;right:20px;z-index:1000">
+    <input type="checkbox" id="modeToggle">
+    <span class="slider"></span>
+  </label>
+
+  <div class="container" style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+    <div style="background:var(--card);padding:40px;border-radius:20px;width:380px;box-shadow:var(--shadow)">
+      <h2 style="text-align:center;margin-bottom:25px;color:var(--accent)">GlacioLive Login</h2>
+      <input type="tel" id="phone" placeholder="Enter your number here" style="width:100%;padding:16px;margin:12px 0;border-radius:12px;border:1px solid #666;font-size:16px;background:var(--bg);color:var(--text)">
+      <button class="btn" onclick="sendOTP()" style="width:100%;padding:16px;font-size:18px">Send OTP</button>
+      <div id="msg" style="margin:15px 0;text-align:center;font-weight:600"></div>
+      <div id="otp" style="display:none">
+        <input type="text" id="code" placeholder="Enter 6-digit OTP" style="width:100%;padding:16px;margin:12px 0;border-radius:12px;border:1px solid #666;background:var(--bg);color:var(--text)">
+        <button class="btn" onclick="verifyOTP()" style="width:100%;padding:16px;font-size:18px">Verify</button>
+      </div>
+      <div style="text-align:center;margin-top:20px">
+        <a href="index.html" style="color:var(--accent);text-decoration:none">Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-water-sci-fi-click-1055.mp3"></audio>
+  <script src="script.js"></script>
+  <script>
+    let OTP;
+    async function sendOTP() {
+      clickSound.play();
+      const phone = document.getElementById('phone').value.trim();
+      if (!phone.startsWith('+91')) return alert('Use +91 number');
+      document.getElementById('msg').innerHTML = 'Sending...';
+      const res = await fetch('https://glacio-otp-1138.twil.io/send-otp', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'phone=' + encodeURIComponent(phone)
+      });
+      const data = await res.json();
+      OTP = data.otp;
+      document.getElementById('msg').innerHTML = '<span style="color:#4caf50">OTP Sent!</span>';
+      document.getElementById('otp').style.display = 'block';
+    }
+    function verifyOTP() {
+      clickSound.play();
+      if (document.getElementById('code').value == OTP) {
+        alert('Login Success!');
+        location.href = 'dashboard.html';
+      } else {
+        document.getElementById('msg').innerHTML = '<span style="color:red">Wrong OTP!</span>';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="glacier-bg"></div>
+  <div class="snow-container"></div>
+  <header>
+    <div class="logo"><span>Glacio</span>Live</div>
+    <nav><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="about.html">About</a></nav>
+    <div class="header-right">
+      <div class="clock" id="clock">00:00 AM</div>
+      <label class="toggle-switch"><input type="checkbox" id="modeToggle"><span class="slider"></span></label>
+    </div>
+  </header>
+
+  <div class="container" style="padding:40px 20px">
+    <h1 style="text-align:center;color:var(--accent);font-size:42px">Admin Dashboard</h1>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px;margin:40px 0">
+      <div style="background:var(--card);padding:25px;border-radius:16px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:50px">Warning</div>
+        <h3>Total Alerts</h3>
+        <p style="font-size:36px;color:var(--accent)" id="alerts">8</p>
+      </div>
+      <div style="background:var(--card);padding:25px;border-radius:16px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:50px">Bell</div>
+        <h3>Subscribers</h3>
+        <p style="font-size:36px;color:var(--accent)" id="subs">124</p>
+      </div>
+    </div>
+    <div style="background:var(--card);border-radius:16px;padding:20px">
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+
+  <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-water-sci-fi-click-1055.mp3"></audio>
+  <script src="script.js"></script>
+  <script>
+    setInterval(() => {
+      document.getElementById('alerts').textContent = 8 + Math.floor(Math.random()*4);
+      document.getElementById('subs').textContent = 124 + Math.floor(Math.random()*10);
+    }, 10000);
+
+    new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: { labels: ['Sikkim','HP','UK'], datasets: [{ label:'Alerts', data:[75,68,62], backgroundColor:'#ff6b35' }] },
+      options: { responsive:true, plugins:{legend:{display:false}} }
+    });
+  </script>
+</body>
+</html>

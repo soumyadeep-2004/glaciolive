@@ -1,0 +1,54 @@
+:root{
+  --bg:#0a1628;--text:#e0e7ef;--accent:#4fc3f7;--card:rgba(10,22,40,0.9);--shadow:0 10px 30px rgba(0,0,0,0.4)
+}
+.light{--bg:#f0f7ff;--text:#0a1628;--accent:#1976d2;--card:rgba(255,255,255,0.95);--shadow:0 10px 30px rgba(0,0,0,0.1)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Josefin Sans',sans-serif}
+body{background:var(--bg);color:var(--text);overflow-x:hidden;transition:0.4s;min-height:100vh;position:relative}
+
+.glacier-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;
+  background:radial-gradient(circle at 30% 70%,rgba(79,195,247,0.3),transparent 50%);
+  animation:glide 40s infinite linear}
+@keyframes glide{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
+
+.snow-container{position:fixed;top:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.snowflake{position:absolute;top:-10px;color:#fff;font-size:18px;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(100vh) rotate(360deg)}}
+
+header{background:rgba(10,22,40,0.95);padding:16px 30px;display:flex;justify-content:space-between;
+  align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:0.4s}
+.light header{background:rgba(255,255,255,0.95)}
+.logo{font-size:32px;font-weight:300}
+.logo span{font-weight:700;color:var(--accent)}
+nav a{color:var(--text);margin:0 18px;text-decoration:none;font-weight:500;transition:0.3s}
+nav a:hover{color:var(--accent)}
+.header-right{display:flex;gap:20px;align-items:center}
+.clock{background:rgba(0,0,0,0.3);padding:8px 16px;border-radius:20px;font-weight:600}
+.light .clock{background:rgba(255,255,255,0.8);color:#0a1628}
+
+/* TOGGLE SWITCH */
+.toggle-switch{position:relative;display:inline-block;width:56px;height:30px}
+.toggle-switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#333;border-radius:30px;transition:0.4s}
+.slider:before{position:absolute;content:"";height:24px;width:24px;left:3px;bottom:3px;background:#ffd700;border-radius:50%;transition:0.4s}
+input:checked + .slider{background:var(--accent)}
+input:checked + .slider:before{transform:translateX(26px);background:#fff}
+
+.container{max-width:1400px;margin:40px auto;padding:0 20px}
+.recents{background:var(--card);padding:20px;border-radius:16px;margin-bottom:30px;box-shadow:var(--shadow)}
+.recent-item{background:#ffd700;color:#0a1628;padding:14px 20px;border-radius:10px;font-weight:600;text-align:center}
+.content-grid{display:grid;grid-template-columns:1fr 360px;gap:25px}
+.map-container{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.alert-tabs{display:flex}
+.tab{flex:1;padding:16px;background:transparent;border:none;color:var(--text);font-size:16px;cursor:pointer;transition:0.3s}
+.tab.active{background:rgba(79,195,247,0.2);color:var(--accent);font-weight:600}
+#map{height:580px;border-radius:12px}
+.right-sidebar .weather-section{background:var(--card);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.section-header{background:#0a1628;color:#fff;padding:14px;text-align:center;border-radius:10px}
+.temperature{font-size:44px;color:var(--accent);text-align:center;margin:10px 0}
+.weather-description{text-align:center;font-size:18px}
+
+.custom-pin{background:#ff6b35;color:#fff;width:40px;height:40px;border-radius:50%;text-align:center;line-height:40px;
+  font-weight:bold;font-size:18px;box-shadow:0 0 15px rgba(255,107,53,0.8);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,107,53,0.7)}70%{box-shadow:0 0 0 15px transparent}}
+
+@media(max-width:1100px){.content-grid{grid-template-columns:1fr}}

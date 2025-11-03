@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlacioLive</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+  <div class="glacier-bg"></div>
+  <div class="snow-container"></div>
+
+  <header>
+    <div class="logo"><span>Glacio</span>Live</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html">About</a>
+      <a href="login.html">Login</a>
+    </nav>
+    <div class="header-right">
+      <div class="clock" id="clock">00:00 AM</div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="modeToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="recents">
+      <h2>Recent GLOF Alerts</h2>
+      <div class="recent-item">South Lhonak Lake - High Risk</div>
+    </div>
+
+    <div class="content-grid">
+      <div class="map-container">
+        <div class="alert-tabs">
+          <button class="tab active" data-view="all">All India</button>
+          <button class="tab" data-view="sikkim">Sikkim</button>
+          <button class="tab" data-view="hp">Himachal</button>
+        </div>
+        <div id="map"></div>
+      </div>
+
+      <div class="right-sidebar">
+        <div class="weather-section">
+          <div class="section-header">Live Weather</div>
+          <div class="weather-content">
+            <h3>Sikkim</h3>
+            <div class="temperature">15°C</div>
+            <div class="weather-description">Clear Sky</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-water-sci-fi-click-1055.mp3"></audio>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
