@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GlacioLive - GLOF Live</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg"></div>
+
+  <header>
+    <div class="logo"><span>Glacio</span>Live</div>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#about">About</a>
+      <a href="login.html" class="login-btn">Login</a>
+    </nav>
+    <div class="clock" id="clock">12:00 AM</div>
+  </header>
+
+  <!-- HOME -->
+  <section id="home" class="page active">
+    <div class="container">
+      <div class="ticker"><span id="ticker-text">Loading alerts...</span></div>
+
+      <div class="grid">
+        <div class="map-box">
+          <div class="tabs">
+            <button data-view="current">Current</button>
+            <button data-view="india" class="active">All India</button>
+            <button data-view="state">State-wise</button>
+          </div>
+          <div id="map"></div>
+        </div>
+
+        <div class="sidebar">
+          <div class="weather">
+            <h3>Live Weather</h3>
+            <div class="search">
+              <input type="text" id="cityInput" placeholder="e.g. Guwahati" />
+              <button onclick="searchCity()">Go</button>
+            </div>
+            <div id="weatherInfo">
+              <div class="loc" id="loc">Detecting...</div>
+              <div class="temp" id="temp">--°C</div>
+              <div class="desc" id="desc">Fetching...</div>
+              <div class="details">
+                <span>Humidity: <b id="hum">--%</b></span>
+                <span>Wind: <b id="wind">-- m/s</b></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="alerts">
+            <h3 id="panelTitle">GLOF Alerts</h3>
+            <div id="alertList">Loading...</div>
+            <div id="stateTable" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="page">
+    <div class="container dash">
+      <h2>Analytics Dashboard</h2>
+      <div class="charts">
+        <canvas id="severityPie"></canvas>
+        <canvas id="stateBar"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="page">
+    <div class="container about">
+      <h2>About GlacioLive</h2>
+      <p>Real-time GLOF early warning system for Himalayan states.</p>
+      <p>Blue dot = Your location | Orange dotted lines = Evacuation paths</p>
+      <h3>Team CryoCast</h3>
+      <p>Made with ❤️ by Soumyadeep, Neelachalam, Sarthak</p>
+    </div>
+  </section>
+
+  <div class="theme-toggle" id="themeToggle">
+    <div class="slider">Sun Moon</div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
