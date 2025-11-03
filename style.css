@@ -1,0 +1,65 @@
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Josefin Sans',sans-serif; }
+body { background:#0a1a2e; color:#e0e7ef; overflow-x:hidden; position:relative; }
+body.light { background:#f0f8ff; color:#0a1a2e; }
+.bg { position:fixed; inset:0; background:radial-gradient(circle at 20% 80%, #4fc3f730, transparent 50%); z-index:-1; animation:drift 30s infinite linear; }
+@keyframes drift { 0%{transform:translateX(-20px)} 100%{transform:translateX(20px)} }
+
+header { position:sticky; top:0; background:rgba(10,26,46,0.95); backdrop-filter:blur(10px); padding:15px 30px; display:flex; justify-content:space-between; align-items:center; z-index:1000; border-bottom:1px solid #ffffff10; }
+.logo { font-size:28px; font-weight:300; } .logo span { font-weight:600; color:#4fc3f7; }
+nav a { color:#e0e7ef; text-decoration:none; margin:0 15px; font-weight:500; }
+nav a:hover { color:#4fc3f7; }
+.clock { background:#0004; padding:8px 16px; border-radius:20px; font-weight:600; }
+
+.page { display:none; padding:20px 0; min-height:90vh; }
+.page.active { display:block; }
+.container { max-width:1400px; margin:auto; padding:0 15px; }
+.dash, .about { text-align:center; padding:40px 20px; }
+
+.ticker { background:#ffd700; color:#000; padding:12px; border-radius:8px; margin-bottom:20px; font-weight:600; overflow:hidden; }
+.ticker span { display:inline-block; animation:scroll 20s linear infinite; white-space:nowrap; }
+@keyframes scroll { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+
+.grid { display:grid; grid-template-columns:1fr 380px; gap:20px; }
+.map-box { background:#112240; border-radius:12px; overflow:hidden; border:2px solid #4fc3f750; }
+.tabs { display:grid; grid-template-columns:1fr 1fr 1fr; }
+.tabs button { padding:14px; background:transparent; border:none; color:#e0e7ef; font-weight:600; cursor:pointer; }
+.tabs button.active { background:#4fc3f730; color:#4fc3f7; }
+#map { height:580px; }
+
+.sidebar > div { background:#112240; border-radius:12px; padding:20px; margin-bottom:20px; border:1px solid #ffffff10; }
+.weather h3, .alerts h3 { color:#4fc3f7; margin-bottom:15px; text-align:center; }
+.search { display:flex; margin-bottom:15px; }
+.search input { flex:1; padding:10px; border-radius:8px 0 0 8px; border:none; }
+.search button { padding:10px 15px; background:#4fc3f7; color:#fff; border:none; border-radius:0 8px 8px 0; cursor:pointer; }
+#weatherInfo { text-align:center; }
+.temp { font-size:48px; font-weight:300; color:#4fc3f7; }
+.details span { display:block; margin:8px 0; font-size:14px; }
+
+.item { display:flex; gap:12px; background:#1e3a5f; padding:14px; border-radius:8px; margin-bottom:10px; }
+.item .icon { width:36px; height:36px; background:#ffd700; color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; flex-shrink:0; }
+
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th, td { padding:12px; text-align:left; border-bottom:1px solid #ffffff20; cursor:pointer; }
+th { background:#4fc3f730; }
+tr:hover td { background:#4fc3f720; }
+.sev.High { color:#f44336; font-weight:bold; }
+.sev.Medium { color:#ff9800; font-weight:bold; }
+.sev.Low { color:#4caf50; font-weight:bold; }
+
+.charts { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px; max-width:1000px; margin-left:auto; margin-right:auto; }
+canvas { background:#112240; border-radius:12px; padding:20px; }
+
+.about ul { text-align:left; max-width:600px; margin:20px auto; }
+.about h3 { margin:20px 0 10px; color:#4fc3f7; }
+
+.g-marker { background:#ffd700 !important; color:#000 !important; border:3px solid #0a1a2e !important; width:30px !important; height:30px !important; border-radius:50% !important; display:flex !important; align-items:center !important; justify-content:center !important; font-weight:bold !important; font-size:18px !important; animation:pulse 2s infinite; }
+@keyframes pulse { 0%{box-shadow:0 0 0 0 #ffd70080} 70%{box-shadow:0 0 0 12px transparent} 100%{box-shadow:0 0 0 0 transparent} }
+
+.theme-toggle { position:fixed; bottom:20px; right:20px; width:70px; height:36px; background:#ffffff30; border-radius:18px; cursor:pointer; z-index:1000; }
+.slider { position:absolute; top:3px; left:3px; width:30px; height:30px; background:#ffd700; border-radius:50%; transition:0.4s; display:flex; align-items:center; justify-content:center; font-size:14px; }
+body.light .slider { transform:translateX(34px); background:#ffb300; }
+
+@media (max-width:960px) {
+  .grid { grid-template-columns:1fr; }
+  .charts { grid-template-columns:1fr; }
+}
