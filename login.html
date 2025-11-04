@@ -510,7 +510,8 @@
             const user = userCredential.user;
             showToast(`Welcome back, ${user.email}!`);
             console.log('Signed in user:', user);
-            // window.location.href = "dashboard.html"; // Redirect on success
+            // NEW: Redirect to home page
+            window.location.href = "index.html"; 
           })
           .catch((error) => {
             showToast(`Error: ${error.message}`);
@@ -526,7 +527,8 @@
           const user = result.user;
           showToast(`Welcome, ${user.displayName}!`);
           console.log("Google Sign-In Successful:", user);
-          // window.location.href = "dashboard.html";
+          // NEW: Redirect to home page
+          window.location.href = "index.html";
         }).catch((error) => {
           if (error.code !== 'auth/popup-closed-by-user') {
             showToast(`Error: ${error.message}`);
@@ -540,18 +542,15 @@
         togglePhoneUI(true);
         
         // Setup reCAPTCHA
-        // FIX: Corrected argument order for RecaptchaVerifier constructor.
-        // 1st: container ID (string), 2nd: parameters (object), 3rd: auth instance
         window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-          'size': 'normal', // 'invisible' is also an option
+          'size': 'normal', 
           'callback': (response) => {
-            // reCAPTCHA solved.
             console.log("reCAPTCHA solved");
           },
           'expired-callback': () => {
             showToast('reCAPTCHA expired. Please try again.');
           }
-        }, auth); // <-- auth object is the third argument
+        }, auth); 
         window.recaptchaVerifier.render();
     });
     
@@ -572,7 +571,6 @@
               showToast(`Error: ${error.message}`);
               console.error('SMS Send Error:', error);
               // Reset reCAPTCHA
-              // Check if verifier still exists before trying to render
               if (window.recaptchaVerifier) {
                 window.recaptchaVerifier.render();
               }
@@ -590,12 +588,11 @@
 
         window.confirmationResult.confirm(code).then((result) => {
           // User signed in successfully.
-          const user = result.user;
+          const user = result.D;
           showToast(`Welcome, ${user.phoneNumber}!`);
           console.log("Phone Sign-In Successful:", user);
-          // Reset UI back to email/pass login
-          togglePhoneUI(false);
-          // window.location.href = "dashboard.html";
+          // NEW: Redirect to home page
+          window.location.href = "index.html";
         }).catch((error) => {
           // Invalid code.
           showToast('Invalid verification code.');
