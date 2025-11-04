@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <!-- NEW: Style for user info -->
+  
+  <!-- NEW: Style for the welcome message -->
   <style>
-    nav #userInfo {
+    .welcome-user {
       color: #fff;
-      font-weight: 300;
+      font-weight: 600;
       margin-right: 15px;
       font-size: 0.9em;
     }
@@ -24,11 +25,14 @@
     <div class="logo"><span>Glacio</span>Live</div>
     <nav>
       <a href="#home">Home</a>
-      <a href="#dashboard">Dashboard</a>
+      <!-- MODIFIED: Pointed to dashboard.html -->
+      <a href="dashboard.html">Dashboard</a>
       <a href="#about">About</a>
-      <!-- NEW: Added IDs for auth UI -->
-      <span id="userInfo" style="display: none;"></span>
-      <a href="login.html" class="login-btn" id="authButton">Login</a>
+      
+      <!-- NEW: User status will be managed here by JS -->
+      <span id="user-status-container">
+        <a href="login.html" class="login-btn">Login</a>
+      </span>
     </nav>
     <div class="clock" id="clock">12:00 AM</div>
   </header>
@@ -76,16 +80,9 @@
     </div>
   </section>
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="page">
-    <div class="container dash">
-      <h2>Analytics Dashboard</h2>
-      <div class="charts">
-        <canvas id="severityPie"></canvas>
-        <canvas id="stateBar"></canvas>
-      </div>
-    </div>
-  </section>
+  <!-- DASHBOARD (REMOVED) -->
+  <!-- The old dashboard section was here. It has been removed 
+       to prevent conflicts with the standalone dashboard.html file. -->
 
   <!-- ABOUT -->
   <section id="about" class="page">
@@ -104,6 +101,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- This script.js probably controls the SPA page switching -->
   <script src="script.js"></script>
 
   <!-- NEW: Firebase Auth Script -->
@@ -131,47 +130,53 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     
-    // Get UI elements
-    const authButton = document.getElementById('authButton');
-    const userInfo = document.getElementById('userInfo');
+    const userStatusContainer = document.getElementById('user-status-container');
 
-    // Listener for authentication state changes
+    // Listen for auth state changes
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in
-        console.log('User signed in:', user);
+        // User is logged in
+        const userName = user.displayName || user.email || 'Welcome!';
+        userStatusContainer.innerHTML = `
+          <span class="welcome-user">Welcome, ${userName.split(' ')[0]}</span>
+          <a href="#" class="login-btn" id="logoutBtn">Logout</a>
+        `;
         
-        // Get user's name (prefer displayName, fallback to email/phone)
-        const userName = user.displayName || user.email || user.phoneNumber;
-        userInfo.textContent = `Welcome, ${userName}!`;
-        userInfo.style.display = 'inline';
-        
-        authButton.textContent = 'Logout';
-        authButton.href = '#'; // Don't redirect
-        
-        // Add logout functionality
-        authButton.onclick = (e) => {
+        // Add event listener for the new logout button
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
           e.preventDefault();
           signOut(auth).then(() => {
             console.log('User signed out');
-            // State will change and the 'else' block will run
+            // UI will update automatically via onAuthStateChanged
           }).catch((error) => {
-            console.error('Sign out error:', error);
+            console.error('Sign out error', error);
           });
-        };
-
+        });
+        
       } else {
-        // User is signed out
-        console.log('User signed out');
-        
-        userInfo.textContent = '';
-        userInfo.style.display = 'none';
-        
-        authButton.textContent = 'Login';
-        authButton.href = 'login.html';
-        authButton.onclick = null; // Remove logout click listener
+        // User is logged out
+        userStatusContainer.innerHTML = '<a href="login.html" class="login-btn">Login</a>';
       }
     });
+
+    // Simple SPA navigation (if your script.js doesn't handle it)
+    // This handles the #home and #about links
+    window.addEventListener('hashchange', navigate);
+    
+    function navigate() {
+      const hash = window.location.hash || '#home';
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      const activePage = document.querySelector(hash);
+      if (activePage) {
+        activePage.classList.add('active');
+      }
+    }
+    // Initial load
+    navigate();
+
   </script>
 </body>
 </html>
+
