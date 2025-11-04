@@ -1,391 +1,482 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Chart.js for analytics -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GlacioLive - Admin Dashboard</title>
   
-  <!-- NEW: Dashboard Layout and Clean-up Styles -->
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  
   <style>
-    /* Re-using some of your root variables if they exist in style.css */
+    /* --- Base Styles & Variables --- */
     :root {
-      --card: #fff;
-      --shadow: 0 4px 12px rgba(0,0,0,0.05);
-      --accent: #ff6b35;
-      --text-color: #333;
-      --bg-color: #f4f7f6;
+      --bg-color: #0b0c10;
+      --card-color: #1f2833;
+      --border-color: #45a29e;
+      --text-color: #c5c6c7;
+      --header-color: #1a1a1a;
+      --accent-color: #66fcf1;
+      --accent-hover: #45a29e;
+      --accent-orange: #ff6b35;
+      --accent-red: #e63946;
+      --accent-green: #2a9d8f;
+      
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      --card-glow: 0 0 15px rgba(102, 252, 241, 0.1);
     }
-    
-    /* Dark mode adjustments (if your style.css has them) */
-    body.dark {
-      --card: #2c2c2c;
-      --text-color: #eee;
-      --bg-color: #1a1a1a;
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Josefin Sans', sans-serif;
     }
-    
+
     body {
-        background-color: var(--bg-color);
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    /* --- Header --- */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background-color: rgba(31, 40, 51, 0.9);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .logo {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+    .logo span {
+      color: var(--accent-color);
+    }
+
+    nav {
+      display: flex;
+      gap: 30px;
+    }
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 1.1em;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    nav a:hover, .user-info a:hover {
+      color: var(--accent-color);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .clock {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .user-info span {
+        font-weight: 600;
+    }
+    .user-info a {
         color: var(--text-color);
-        font-family: 'Poppins', 'Josefin Sans', sans-serif; /* Added Poppins for consistency */
+        text-decoration: none;
+        font-weight: 600;
+        background: var(--accent-hover);
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background 0.3s;
     }
-    
-    .container {
-        max-width: 1400px; /* Wider for PC */
-        margin: 0 auto;
-    }
-    
-    /* NEW: Main Dashboard Grid Layout */
-    .dashboard-layout-grid {
-        display: grid;
-        /* A 3-column grid for flexibility */
-        grid-template-columns: repeat(3, 1fr);
-        gap: 25px;
-        margin-top: 40px;
-    }
-    
-    /* NEW: Grid spanning classes */
-    .grid-col-span-1 { grid-column: span 1; }
-    .grid-col-span-2 { grid-column: span 2; }
-    .grid-col-span-3 { grid-column: span 3; }
-
-    /* Responsive adjustments for the grid */
-    @media (max-width: 1024px) {
-        /* On tablets, switch to 2 columns */
-        .dashboard-layout-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        /* Make sidebar items span 2 cols */
-        .grid-col-span-1 { grid-column: span 2; }
-        .grid-col-span-3 { grid-column: span 2; }
-    }
-    
-    @media (max-width: 768px) {
-        /* On mobile, stack everything */
-        .dashboard-layout-grid {
-            grid-template-columns: 1fr;
-        }
-        /* All items span 1 col */
-        .grid-col-span-1, .grid-col-span-2, .grid-col-span-3 {
-            grid-column: span 1;
-        }
+    .user-info a:hover {
+        background: var(--accent-color);
+        color: var(--bg-color);
     }
 
+    /* --- Main Dashboard Layout --- */
+    .dashboard-container {
+      padding: 30px;
+    }
 
-    /* Card for stats */
+    .main-title {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--accent-orange);
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background-color: var(--card-color);
+      padding: 25px;
+      border-radius: 12px;
+      border-left: 5px solid var(--accent-color);
+      box-shadow: var(--card-glow);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 25px rgba(102, 252, 241, 0.2);
+    }
+    .stat-card h3 {
+      font-size: 1.2em;
+      color: var(--text-color);
+      margin-bottom: 15px;
+    }
+    .stat-card p {
+      font-size: 2.5em;
+      font-weight: 700;
+    }
+    #total-users { color: var(--accent-color); }
+    #total-alerts { color: var(--accent-orange); }
+    #total-subs { color: var(--accent-green); }
+
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr; /* 2/3 for main content, 1/3 for sidebar */
+      grid-template-rows: auto auto;
       gap: 25px;
     }
     
-    .stat-card {
-      background: var(--card);
-      padding: 25px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-    
-    .stat-card h3 {
-        margin-top: 10px;
-        font-size: 1.2em;
-        font-weight: 600;
-        color: var(--text-color);
-    }
-    
-    .stat-card p {
-        font-size: 36px;
-        color: var(--accent);
-        font-weight: 700;
-        margin: 5px 0 0 0;
-    }
-    
-    /* Universal style for all dashboard sections */
-    .dashboard-section {
-        background: var(--card);
-        border-radius: 16px;
+    .grid-card {
+        background-color: var(--card-color);
         padding: 25px;
-        box-shadow: var(--shadow);
-        margin-bottom: 0; /* Handled by grid gap */
+        border-radius: 12px;
+        box-shadow: var(--card-glow);
     }
-    
-    .dashboard-section h2 {
-        text-align: left; /* Cleaner than center */
-        font-size: 24px;
-        color: var(--text-color); /* Not accent, more subtle */
-        margin-top: 0;
-        margin-bottom: 25px;
+    .grid-card h2 {
+        font-size: 1.5em;
+        color: var(--accent-color);
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--border-color);
         padding-bottom: 10px;
-        border-bottom: 1px solid var(--bg-color);
     }
 
-    /* Calendar Styles */
-    .calendar-nav {
+    /* --- User Table --- */
+    #user-table-card {
+      grid-column: 1 / 2; /* Span first column */
+      grid-row: 1 / 2; /* Span first row */
+      overflow-x: auto; /* Allow horizontal scroll if needed */
+    }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .user-table th, .user-table td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+    .user-table thead {
+      background-color: #2a3a4a; /* Darker blue-gray */
+    }
+    .user-table th {
+      color: var(--accent-color);
+      font-size: 1.1em;
+    }
+    .user-table tbody tr {
+      border-bottom: 1px solid #2a3a4a;
+    }
+    .user-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    .user-table tbody tr:hover {
+      background-color: #2a3a4a;
+    }
+
+    /* --- Analytics Charts --- */
+    #alert-severity-card {
+      grid-column: 2 / 3; /* Span second column */
+      grid-row: 1 / 2; /* Span first row */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #alert-state-card {
+      grid-column: 2 / 3; /* Span second column */
+      grid-row: 2 / 3; /* Span second row */
+    }
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px; /* Constrain pie chart size */
+        margin: auto;
+    }
+    #severityPie {
+        max-height: 300px;
+    }
+    #stateBar {
+        max-height: 350px;
+    }
+
+    /* --- Calendar --- */
+    #calendar-card {
+      grid-column: 1 / 2; /* Span first column */
+      grid-row: 2 / 3; /* Span second row */
+    }
+    .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
-    
-    .calendar-nav button {
-      background: var(--accent);
-      color: white;
+    .calendar-header button {
+      background: var(--accent-hover);
       border: none;
-      padding: 8px 15px;
-      border-radius: 8px;
+      color: white;
+      font-size: 1.5em;
+      font-weight: 700;
+      padding: 0 12px;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 1.2em;
       transition: background 0.3s;
     }
-    
-    .calendar-nav button:hover {
-      background: #e05a2e;
+    .calendar-header button:hover {
+      background: var(--accent-color);
+      color: var(--bg-color);
     }
-    
-    .calendar-nav h3 {
-      font-size: 1.8em;
-      color: var(--text-color);
-      margin: 0;
+    #month-year {
+      font-size: 1.5em;
+      font-weight: 600;
     }
-    
-    #calendar-grid {
+    .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 5px;
     }
-    
-    .calendar-header, .calendar-day {
-      background: var(--bg-color);
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-    }
-    
-    .calendar-header {
-      font-weight: 700;
-      color: var(--accent);
-    }
-    
     .calendar-day {
-      min-height: 100px;
+      background: #2a3a4a;
+      border-radius: 5px;
+      padding: 10px;
+      min-height: 80px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      font-size: 0.9em;
-      color: var(--text-color);
-      position: relative;
+      border: 1px solid transparent;
+      transition: border 0.3s;
     }
-    
-    .calendar-day.empty {
-      background: transparent;
+    .calendar-day.header {
+      background: none;
+      min-height: auto;
+      text-align: center;
+      font-weight: 700;
+      color: var(--accent-color);
     }
-    
+    .calendar-day.not-current {
+      background: var(--card-color);
+      opacity: 0.5;
+    }
     .day-number {
       font-weight: 600;
       font-size: 1.1em;
-      margin-bottom: 5px;
     }
-    
-    .day-joins {
-      background: #28a745;
-      color: white;
-      font-size: 0.8em;
-      padding: 3px 8px;
-      border-radius: 12px;
-      cursor: pointer;
+    .join-count {
+      margin-top: auto;
+      align-self: flex-end;
       font-weight: 700;
+      font-size: 1.2em;
+      color: var(--accent-color);
+    }
+    .calendar-day.has-joins {
+        border: 1px solid var(--accent-color);
     }
     
-    .day-joins:hover {
-        background: #218838;
+    /* --- Responsive --- */
+    @media (max-width: 900px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr; /* Stack everything in one column */
+        }
+        /* Re-order for mobile */
+        #user-table-card { grid-row: 2 / 3; }
+        #alert-severity-card { grid-row: 1 / 2; }
+        #calendar-card { grid-row: 3 / 3; }
+        #alert-state-card { grid-row: 4 / 4; }
     }
-
-    /* User Table Styles */
-    .table-container {
-        overflow-x: auto; /* Makes table responsive on small screens */
-    }
-    
-    #user-table {
-      width: 100%;
-      border-collapse: collapse;
-      color: var(--text-color);
-    }
-    
-    #user-table th, #user-table td {
-      padding: 12px 15px;
-      border-bottom: 1px solid var(--bg-color);
-      text-align: left;
-    }
-    
-    #user-table th {
-      background: var(--bg-color);
-      color: var(--accent);
-    }
-    
-    #user-table tr:hover {
-        background-color: var(--bg-color);
-    }
-
-    /* Modal Styles */
-    #day-modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5);
-        justify-content: center;
-        align-items: center;
+    @media (max-width: 600px) {
+        header {
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+        }
+        nav {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        .dashboard-container {
+            padding: 15px;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr; /* Single column stats */
+        }
+        .main-title {
+            font-size: 2em;
+        }
     }
     
-    #modal-content {
-        background: var(--card);
-        padding: 30px;
-        border-radius: 16px;
-        min-width: 300px;
-        max-width: 500px;
-        max-height: 80vh;
-        overflow-y: auto;
+    /* Loading Spinner */
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 5px solid var(--text-color);
+      border-bottom-color: var(--accent-color);
+      border-radius: 50%;
+      display: block;
+      margin: 20px auto;
+      animation: rotation 1s linear infinite;
     }
-    
-    #modal-content h3 {
-        margin-top: 0;
-        color: var(--accent);
-    }
-    
-    #modal-users-list {
-        list-style: none;
-        padding-left: 0;
-    }
-    
-    #modal-users-list li {
-        padding: 8px 0;
-        border-bottom: 1px solid var(--bg-color);
-    }
-    
-    #modal-close {
-        float: right;
-        font-size: 1.5em;
-        cursor: pointer;
-        font-weight: 700;
+    @keyframes rotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
   </style>
 </head>
 <body>
-  <div class="glacier-bg"></div>
-  <div class="snow-container"></div>
+
+  <!-- --- Header --- -->
   <header>
     <div class="logo"><span>Glacio</span>Live</div>
-    <nav><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="about.html">About</a></nav>
+    <nav>
+      <a href="index.html#home">Home</a>
+      <a href="index.html#dashboard">Analytics</a>
+      <a href="index.html#about">About</a>
+    </nav>
     <div class="header-right">
+      <div class="user-info" id="userInfo">
+        <!-- Populated by JS -->
+      </div>
       <div class="clock" id="clock">00:00 AM</div>
-      <!-- Assuming modeToggle exists in your script.js -->
-      <label class="toggle-switch"><input type="checkbox" id="modeToggle"><span class="slider"></span></label>
     </div>
   </header>
 
-  <div class="container" style="padding:40px 20px">
-    <h1 style="text-align:center;color:var(--accent);font-size:42px">Admin Dashboard</h1>
-    
-    <!-- NEW: Main Dashboard Grid -->
-    <div class="dashboard-layout-grid">
-    
-        <!-- Stats Grid (Full Width) -->
-        <div class="dashboard-section grid-col-span-3">
-            <div class="stats-grid">
-              <div class="stat-card">
-                <h3>Total Alerts</h3>
-                <p id="alerts">8</p>
-              </div>
-              <div class="stat-card">
-                <h3>Total Users</h3>
-                <p id="total-users-count">0</p>
-              </div>
-              <div class="stat-card">
-                <h3>Subscribers</h3>
-                <p id="subs">124</p> <!-- Added from your old file -->
-              </div>
-            </div>
+  <!-- --- Main Dashboard --- -->
+  <main class="dashboard-container">
+    <h1 class="main-title">Admin Dashboard</h1>
+
+    <!-- Stats Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <p id="total-users"><span class="loader"></span></p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Alerts (Demo)</h3>
+        <p id="total-alerts">8</p>
+      </div>
+      <div class="stat-card">
+        <h3>Subscribers (Demo)</h3>
+        <p id="total-subs">124</p>
+      </div>
+    </section>
+
+    <!-- Main Grid -->
+    <section class="dashboard-grid">
+      
+      <!-- User Table -->
+      <div class="grid-card" id="user-table-card">
+        <h2>All Users</h2>
+        <div style="overflow-x: auto;">
+            <table class="user-table">
+            <thead>
+                <tr>
+                <th>Name</th>
+                <th>Contact (Email/Phone)</th>
+                <th>Joined On</th>
+                </tr>
+            </thead>
+            <tbody id="user-table-body">
+                <!-- JS will populate this -->
+                <tr><td colspan="3" style="text-align: center;"><span class="loader"></span></td></tr>
+            </tbody>
+            </table>
         </div>
-        
-        <!-- User List Section (Main Column) -->
-        <div class="dashboard-section grid-col-span-2">
-            <h2>All Users</h2>
-            <div class="table-container">
-                <table id="user-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Contact</th>
-                            <th>Joined On</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body">
-                        <!-- User rows will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Alert Analytics (Sidebar) -->
-        <div class="dashboard-section grid-col-span-1">
-            <h2>Alert Severity</h2>
+      </div>
+
+      <!-- Alert Severity Pie Chart -->
+      <div class="grid-card" id="alert-severity-card">
+        <h2>Alert Severity</h2>
+        <div class="chart-container">
             <canvas id="severityPie"></canvas>
         </div>
-        
-        <!-- Calendar Section (Main Column) -->
-        <div class="dashboard-section grid-col-span-2">
-            <h2>Join Calendar</h2>
-            <div class="calendar-nav">
-                <button id="prev-month">◄</button>
-                <h3 id="month-year"></h3>
-                <button id="next-month">►</button>
-            </div>
-            <div id="calendar-grid"></div>
+      </div>
+      
+      <!-- Join Calendar -->
+      <div class="grid-card" id="calendar-card">
+        <div class="calendar-header">
+          <button id="prev-month">&lt;</button>
+          <h2 id="month-year"></h2>
+          <button id="next-month">&gt;</button>
         </div>
-        
-        <!-- Alerts by State (Sidebar) -->
-        <div class="dashboard-section grid-col-span-1">
-            <h2>Alerts by State</h2>
+        <div class="calendar-grid" id="calendar-headers">
+          <div class="calendar-day header">Sun</div>
+          <div class="calendar-day header">Mon</div>
+          <div class="calendar-day header">Tue</div>
+          <div class="calendar-day header">Wed</div>
+          <div class="calendar-day header">Thu</div>
+          <div class="calendar-day header">Fri</div>
+          <div class="calendar-day header">Sat</div>
+        </div>
+        <div class="calendar-grid" id="calendar-body">
+          <!-- JS will populate this -->
+        </div>
+      </div>
+
+      <!-- Alerts by State Bar Chart -->
+      <div class="grid-card" id="alert-state-card">
+        <h2>Alerts by State</h2>
+        <div class="chart-container">
             <canvas id="stateBar"></canvas>
         </div>
-    
-    </div> <!-- End Dashboard Grid -->
-
-  </div> <!-- End Container -->
-  
-  <!-- Day Modal -->
-  <div id="day-modal">
-      <div id="modal-content">
-          <span id="modal-close">&times;</span>
-          <h3 id="modal-date"></h3>
-          <ul id="modal-users-list"></ul>
       </div>
-  </div>
 
-  <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-water-sci-fi-click-1055.mp3"></audio>
-  
-  <!-- Load your original script for clocks, etc. -->
-  <script src="script.js"></script>
+    </section>
+  </main>
 
-  <!-- NEW: Firebase Dashboard Script -->
+
+  <!-- --- Firebase & Logic --- -->
   <script type="module">
-    // Import Firebase services
+    // --- Firebase SDK Imports ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
     import { 
       getFirestore, 
       collection, 
-      query, 
-      orderBy, 
-      getDocs 
-    } from "https.www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+      getDocs,
+      doc, getDoc // Added getDoc
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-    // Your Firebase Config
+    // --- Firebase Config ---
     const firebaseConfig = {
       apiKey: "AIzaSyBt1Ats_Y4epVTioinUuDB_AfQUFanHtU0",
       authDomain: "glaciolive-fe6ea.firebaseapp.com",
@@ -396,253 +487,264 @@
       measurementId: "G-ZJCNG5LTS0"
     };
 
-    // Initialize Firebase
+    // --- Initialize ---
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- State Variables ---
-    let joinData = new Map(); // Stores join data: "YYYY-M-D" -> [user, user]
-    let currentDate = new Date();
+    // --- Global User Data Store ---
+    let allUsersData = [];
     
-    // --- UI Elements ---
-    const totalUsersCount = document.getElementById('total-users-count');
-    const userTableBody = document.getElementById('user-table-body');
-    const calendarGrid = document.getElementById('calendar-grid');
-    const monthYearDisplay = document.getElementById('month-year');
-    const prevMonthBtn = document.getElementById('prev-month');
-    const nextMonthBtn = document.getElementById('next-month');
-    const dayModal = document.getElementById('day-modal');
-    const modalClose = document.getElementById('modal-close');
-    const modalDate = document.getElementById('modal-date');
-    const modalUsersList = document.getElementById('modal-users-list');
+    // --- Live Clock ---
+    const clockElement = document.getElementById('clock');
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        clockElement.textContent = timeString;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // --- Auth Check ---
-    onAuthStateChanged(auth, (user) => {
+    // --- Auth State ---
+    const userInfoElement = document.getElementById('userInfo');
+    
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // User is logged in, load the dashboard data
-        loadDashboardData();
-        // NEW: Render analytics charts
-        renderAnalyticsCharts();
+        // User is signed in
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        const displayName = userDoc.exists() ? userDoc.data().displayName : user.email.split('@')[0];
+        
+        userInfoElement.innerHTML = `
+          <span>Welcome, ${displayName}</span>
+          <a href="#" id="logoutBtn">Logout</a>
+        `;
+        
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            }).catch(err => console.error("Logout error", err));
+        });
+
+        // User is logged in, fetch dashboard data
+        fetchUsers();
+        
       } else {
-        // User is not logged in, redirect to login
-        window.location.href = "login.html";
+        // User is signed out
+        userInfoElement.innerHTML = `<a href="login.html">Login</a>`;
+        
+        // Clear dashboard data
+        document.getElementById('total-users').innerHTML = '0';
+        document.getElementById('user-table-body').innerHTML = 
+            '<tr><td colspan="3" style="text-align: center;">Please log in to view user data.</td></tr>';
       }
+      
+      // Always draw charts with demo data
+      drawCharts();
     });
 
-    // --- Data Loading ---
-    async function loadDashboardData() {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, orderBy("joinDate", "desc"));
-      
-      const snapshot = await getDocs(q);
-      
-      // Reset data
-      joinData.clear();
-      let allUsers = [];
-
-      snapshot.forEach(doc => {
-        const user = doc.data();
-        if (user.joinDate) { // Only process users with a joinDate
-            allUsers.push(user);
-            const date = user.joinDate.toDate();
-            // Use a simple key for the map
-            const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`; 
-            
-            if (!joinData.has(dateKey)) {
-                joinData.set(dateKey, []);
-            }
-            joinData.get(dateKey).push(user);
-        }
-      });
-      
-      // 1. Update Total Users
-      totalUsersCount.textContent = snapshot.size;
-      
-      // 2. Render User Table
-      renderUserTable(allUsers);
-      
-      // 3. Render Calendar
-      renderCalendar();
-    }
-
-    // --- Render Functions ---
-    
-    function renderUserTable(users) {
-      userTableBody.innerHTML = ''; // Clear existing table
-      for (const user of users) {
-        const tr = document.createElement('tr');
-        
-        const name = user.displayName || 'N/A';
-        const contact = user.email || user.phoneNumber || 'N/A';
-        const joinDate = user.joinDate ? user.joinDate.toDate().toLocaleDateString() : 'N/A';
-        
-        tr.innerHTML = `
-          <td>${name}</td>
-          <td>${contact}</td>
-          <td>${joinDate}</td>
-        `;
-        userTableBody.appendChild(tr);
-      }
-    }
-
-    function renderCalendar() {
-      calendarGrid.innerHTML = ''; // Clear grid
-      
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
-      
-      monthYearDisplay.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
-      
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      
-      // Add day headers
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      for (const day of days) {
-          const headerEl = document.createElement('div');
-          headerEl.classList.add('calendar-header');
-          headerEl.textContent = day;
-          calendarGrid.appendChild(headerEl);
-      }
-      
-      // Add empty cells for offset
-      for (let i = 0; i < firstDay; i++) {
-          const emptyEl = document.createElement('div');
-          emptyEl.classList.add('calendar-day', 'empty');
-          calendarGrid.appendChild(emptyEl);
-      }
-      
-      // Add day cells
-      for (let day = 1; day <= daysInMonth; day++) {
-          const dayEl = document.createElement('div');
-          dayEl.classList.add('calendar-day');
-          
-          const dayNumber = document.createElement('div');
-          dayNumber.classList.add('day-number');
-          dayNumber.textContent = day;
-          dayEl.appendChild(dayNumber);
-          
-          // Check if anyone joined this day
-          const dateKey = `${year}-${month}-${day}`;
-          if (joinData.has(dateKey)) {
-              const usersToday = joinData.get(dateKey);
-              const joinsEl = document.createElement('div');
-              joinsEl.classList.add('day-joins');
-              joinsEl.textContent = `${usersToday.length} Joined`;
-              
-              // Show modal on click
-              joinsEl.onclick = () => showDayModal(usersToday, new Date(year, month, day));
-              
-              dayEl.appendChild(joinsEl);
-          }
-          
-          calendarGrid.appendChild(dayEl);
-      }
-    }
-    
-    // --- NEW: Render Analytics Charts (using global Chart variable) ---
-    function renderAnalyticsCharts() {
+    // --- Data Fetching ---
+    async function fetchUsers() {
         try {
-          // Pie Chart
-          new Chart(document.getElementById('severityPie'), {
+            const usersCollection = collection(db, "users");
+            const querySnapshot = await getDocs(usersCollection);
+            
+            allUsersData = []; // Clear previous data
+            
+            querySnapshot.forEach((doc) => {
+                allUsersData.push(doc.data());
+            });
+
+            // Update UI
+            document.getElementById('total-users').textContent = allUsersData.length;
+            populateUserTable(allUsersData);
+            
+            // Re-render calendar with new user data
+            renderCalendar(currentMonth, currentYear);
+            
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            document.getElementById('total-users').textContent = 'Error';
+            document.getElementById('user-table-body').innerHTML = 
+                '<tr><td colspan="3" style="text-align: center;">Error loading users.</td></tr>';
+            if (error.code === 'permission-denied') {
+                 document.getElementById('user-table-body').innerHTML = 
+                '<tr><td colspan="3" style="text-align: center;">Permission denied. Make sure you are logged in and have correct Firestore rules.</td></tr>';
+            }
+        }
+    }
+
+    // --- UI Population ---
+    function populateUserTable(users) {
+        const tableBody = document.getElementById('user-table-body');
+        tableBody.innerHTML = ''; // Clear loader
+        
+        if (users.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No users have signed up yet.</td></tr>';
+            return;
+        }
+
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            
+            const joinDate = user.joinDate ? user.joinDate.toDate().toLocaleDateString() : 'N/A';
+            const contact = user.email || user.phoneNumber || 'N/A';
+            const name = user.displayName || 'Anonymous';
+            
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${contact}</td>
+                <td>${joinDate}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // --- Calendar Logic ---
+    const calendarBody = document.getElementById('calendar-body');
+    const monthYearElement = document.getElementById('month-year');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
+    
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+
+    function renderCalendar(month, year) {
+        calendarBody.innerHTML = '';
+        monthYearElement.textContent = `${new Date(year, month).toLocaleString('default', { month: 'long' })} ${year}`;
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Aggregate join data
+        const joinsByDay = {};
+        allUsersData.forEach(user => {
+            if (user.joinDate) {
+                const joinDate = user.joinDate.toDate();
+                if (joinDate.getFullYear() === year && joinDate.getMonth() === month) {
+                    const day = joinDate.getDate();
+                    joinsByDay[day] = (joinsByDay[day] || 0) + 1;
+                }
+            }
+        });
+
+        // Fill blank days at the start
+        for (let i = 0; i < firstDay; i++) {
+            calendarBody.innerHTML += `<div class="calendar-day not-current"></div>`;
+        }
+        
+        // Fill actual days
+        for (let day = 1; day <= daysInMonth; day++) {
+            const joins = joinsByDay[day] || 0;
+            const hasJoins = joins > 0;
+            
+            calendarBody.innerHTML += `
+                <div class="calendar-day ${hasJoins ? 'has-joins' : ''}">
+                    <div class="day-number">${day}</div>
+                    ${hasJoins ? `<div class="join-count">+${joins}</div>` : ''}
+                </div>
+            `;
+        }
+    }
+    
+    prevMonthBtn.addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentMonth, currentYear);
+    });
+    
+    nextMonthBtn.addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentMonth, currentYear);
+    });
+
+    // --- Chart.js Drawing ---
+    function drawCharts() {
+        // Demo Data
+        const severityData = {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Alert Severity',
+                data: [5, 10, 3], // Sample data
+                backgroundColor: [
+                    'rgba(230, 57, 70, 0.7)',  // --accent-red
+                    'rgba(255, 107, 53, 0.7)', // --accent-orange
+                    'rgba(42, 157, 143, 0.7)'  // --accent-green
+                ],
+                borderColor: [
+                    '#e63946',
+                    '#ff6b35',
+                    '#2a9d8f'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        const stateData = {
+            labels: ['Sikkim', 'HP', 'UK', 'Ladakh'],
+            datasets: [{
+                label: 'Alerts by State',
+                data: [7, 4, 6, 2], // Sample data
+                backgroundColor: 'rgba(102, 252, 241, 0.6)', // --accent-color
+                borderColor: '#66fcf1',
+                borderWidth: 1
+            }]
+        };
+
+        // Chart.js default styling
+        Chart.defaults.color = 'rgba(197, 198, 199, 0.8)'; // --text-color
+        Chart.defaults.borderColor = 'rgba(69, 162, 158, 0.2)'; // --border-color
+        
+        // Pie Chart
+        const pieCtx = document.getElementById('severityPie').getContext('2d');
+        new Chart(pieCtx, {
             type: 'pie',
-            data: {
-              labels: ['High', 'Medium', 'Low'],
-              datasets: [{
-                data: [45, 30, 25], // Demo data
-                backgroundColor: ['#dc3545', '#ffc107', '#28a745'],
-                borderColor: 'var(--card)',
-                borderWidth: 2
-              }]
-            },
+            data: severityData,
             options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
-                  labels: { color: 'var(--text-color)' }
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
                 }
-              }
             }
-          });
-
-          // Bar Chart
-          new Chart(document.getElementById('stateBar'), {
+        });
+        
+        // Bar Chart
+        const barCtx = document.getElementById('stateBar').getContext('2d');
+        new Chart(barCtx, {
             type: 'bar',
-            data: {
-              labels: ['Sikkim', 'HP', 'UK', 'Ladakh'],
-              datasets: [{
-                label: 'Alerts',
-                data: [75, 68, 62, 40], // Demo data
-                backgroundColor: 'var(--accent)',
-                borderRadius: 4
-              }]
-            },
+            data: stateData,
             options: {
-              responsive: true,
-              plugins: {
-                legend: { display: false }
-              },
-              scales: {
-                y: { 
-                    ticks: { color: 'var(--text-color)' }, 
-                    grid: { color: 'rgba(128,128,128,0.2)' } 
+                responsive: true,
+                indexAxis: 'y', // Horizontal bar chart
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
                 },
-                x: { 
-                    ticks: { color: 'var(--text-color)' }, 
-                    grid: { display: false } 
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 }
-              }
             }
-          });
-        } catch (e) {
-            console.error("Chart.js error: ", e);
-        }
-    }
-    
-    // --- Modal Functions ---
-    
-    function showDayModal(users, date) {
-        modalDate.textContent = `Users who joined on ${date.toLocaleDateString()}`;
-        modalUsersList.innerHTML = ''; // Clear list
-        
-        for (const user of users) {
-            const li = document.createElement('li');
-            li.textContent = user.displayName || user.email || user.phoneNumber;
-            modalUsersList.appendChild(li);
-        }
-        
-        dayModal.style.display = 'flex';
-    }
-    
-    function hideDayModal() {
-        dayModal.style.display = 'none';
+        });
     }
 
-    // --- Event Listeners ---
-    prevMonthBtn.onclick = () => {
-      currentDate.setMonth(currentDate.getMonth() - 1);
-      renderCalendar();
-    };
-    
-    nextMonthBtn.onclick = () => {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      renderCalendar();
-    };
-    
-    modalClose.onclick = hideDayModal;
-    dayModal.onclick = (e) => {
-        if (e.target === dayModal) {
-            hideDayModal();
-        }
-    };
-    
-    // Static data for alerts/subs from your original file
-    document.getElementById('alerts').textContent = 8;
-    document.getElementById('subs').textContent = 124;
-    
   </script>
 </body>
 </html>
-
