@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <!-- NEW: Style for user info -->
+  <style>
+    nav #userInfo {
+      color: #fff;
+      font-weight: 300;
+      margin-right: 15px;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
   <div class="bg"></div>
@@ -17,7 +26,9 @@
       <a href="#home">Home</a>
       <a href="#dashboard">Dashboard</a>
       <a href="#about">About</a>
-      <a href="login.html" class="login-btn">Login</a>
+      <!-- NEW: Added IDs for auth UI -->
+      <span id="userInfo" style="display: none;"></span>
+      <a href="login.html" class="login-btn" id="authButton">Login</a>
     </nav>
     <div class="clock" id="clock">12:00 AM</div>
   </header>
@@ -94,5 +105,73 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
+
+  <!-- NEW: Firebase Auth Script -->
+  <script type="module">
+    // Import functions from the Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+
+    // YOUR FIREBASE CONFIGURATION OBJECT
+    const firebaseConfig = {
+      apiKey: "AIzaSyBt1Ats_Y4epVTioinUuDB_AfQUFanHtU0",
+      authDomain: "glaciolive-fe6ea.firebaseapp.com",
+      projectId: "glaciolive-fe6ea",
+      storageBucket: "glaciolive-fe6ea.firebasestorage.app",
+      messagingSenderId: "562979922381",
+      appId: "1:562979922381:web:7c6686faa1a7181880e484",
+      measurementId: "G-ZJCNG5LTS0"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    
+    // Get UI elements
+    const authButton = document.getElementById('authButton');
+    const userInfo = document.getElementById('userInfo');
+
+    // Listener for authentication state changes
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        console.log('User signed in:', user);
+        
+        // Get user's name (prefer displayName, fallback to email/phone)
+        const userName = user.displayName || user.email || user.phoneNumber;
+        userInfo.textContent = `Welcome, ${userName}!`;
+        userInfo.style.display = 'inline';
+        
+        authButton.textContent = 'Logout';
+        authButton.href = '#'; // Don't redirect
+        
+        // Add logout functionality
+        authButton.onclick = (e) => {
+          e.preventDefault();
+          signOut(auth).then(() => {
+            console.log('User signed out');
+            // State will change and the 'else' block will run
+          }).catch((error) => {
+            console.error('Sign out error:', error);
+          });
+        };
+
+      } else {
+        // User is signed out
+        console.log('User signed out');
+        
+        userInfo.textContent = '';
+        userInfo.style.display = 'none';
+        
+        authButton.textContent = 'Login';
+        authButton.href = 'login.html';
+        authButton.onclick = null; // Remove logout click listener
+      }
+    });
+  </script>
 </body>
 </html>
