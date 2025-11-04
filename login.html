@@ -35,7 +35,6 @@
     .container {
       position: relative;
       width: 400px;
-      /* Adjusted height to prevent overflow with reCAPTCHA */
       height: 600px;
       perspective: 1000px;
     }
@@ -62,7 +61,7 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      padding: 40px; /* Reduced padding slightly */
+      padding: 40px; 
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -91,7 +90,7 @@
 
     .input-group {
       position: relative;
-      margin: 20px 0; /* Reduced margin */
+      margin: 20px 0;
     }
 
     .input-group input {
@@ -154,7 +153,6 @@
       box-shadow: 0 10px 25px rgba(110, 142, 251, 0.5);
     }
 
-    /* Styles for the Google button */
     .google-btn {
       width: 100%;
       padding: 15px;
@@ -166,7 +164,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: 0.3s;
-      margin-top: 15px; /* Adjusted margin */
+      margin-top: 15px; 
       display: flex;
       align-items: center;
       justify-content: center;
@@ -182,7 +180,6 @@
       width: 20px;
     }
     
-    /* NEW: Phone Button Style */
     .phone-btn {
         background: linear-gradient(90deg, #4caf50, #81c784);
         margin-top: 10px;
@@ -195,7 +192,7 @@
 
     .link {
       text-align: center;
-      margin-top: 20px; /* Adjusted margin */
+      margin-top: 20px; 
       color: #666;
       font-size: 0.9em;
     }
@@ -211,14 +208,12 @@
       text-decoration: underline;
     }
     
-    /* NEW: reCAPTCHA container */
     #recaptcha-container {
         margin-top: 15px;
         display: flex;
         justify-content: center;
     }
     
-    /* NEW: Groups for toggling UI */
     #phone-auth-group, #code-auth-group {
         display: none;
     }
@@ -228,7 +223,6 @@
     }
 
 
-    /* Floating Particles */
     .particles {
       position: absolute;
       width: 100%;
@@ -280,10 +274,8 @@
       <div class="form-content">
         <h2 id="login-title">Welcome Back</h2>
         
-        <!-- Email/Pass Login Form -->
         <form id="emailLoginForm">
           
-          <!-- Email/Pass UI -->
           <div id="email-pass-group">
             <div class="input-group">
               <input type="email" name="email" required />
@@ -296,7 +288,6 @@
             <button type="submit" class="btn" id="loginBtn">Login</button>
           </div>
           
-          <!-- Google Button -->
           <div id="google-btn-group">
               <button type="button" class="google-btn" id="googleLoginBtn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon">
@@ -304,12 +295,10 @@
               </button>
           </div>
           
-          <!-- Phone Button -->
           <div id="show-phone-btn-group">
              <button type="button" class="btn phone-btn" id="showPhoneAuthBtn">Sign in with Phone</button>
           </div>
 
-          <!-- Phone Auth UI (Hidden) -->
           <div id="phone-auth-group">
             <div class="input-group">
               <input type="tel" id="phoneNumber" />
@@ -319,7 +308,6 @@
             <button type="button" class="btn" id="sendCodeBtn">Send Code</button>
           </div>
 
-          <!-- Code Auth UI (Hidden) -->
           <div id="code-auth-group">
             <div class="input-group">
               <input type="text" id="verificationCode" />
@@ -329,7 +317,6 @@
           </div>
         </form>
 
-        <!-- Toggle Links -->
         <div class="link" id="register-link-group">
           New here? <a id="showRegister">Create an account</a>
         </div>
@@ -369,7 +356,7 @@
   <div class="success" id="successMsg">Success! Action completed.</div>
 
   <script>
-    // Your original script for the flip animation and particles
+    // Flip animation and particles
     const container = document.getElementById('container');
     const showRegister = document.getElementById('showRegister');
     const showLogin = document.getElementById('showLogin');
@@ -383,8 +370,6 @@
       container.classList.remove('active');
     });
 
-    // Floating particles
-    // ... (particle code is unchanged)
     const particlesContainer = document.getElementById('particles');
     for (let i = 0; i < 50; i++) {
       const particle = document.createElement('div');
@@ -397,7 +382,6 @@
       particlesContainer.appendChild(particle);
     }
 
-    // Toast message function
     function showToast(message) {
       successMsg.textContent = message;
       successMsg.classList.add('show');
@@ -415,12 +399,20 @@
       getAuth, 
       GoogleAuthProvider, 
       signInWithPopup,
-      // NEW Imports
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       RecaptchaVerifier,
-      signInWithPhoneNumber
-    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      signInWithPhoneNumber,
+      updateProfile // NEW: Import updateProfile
+    } from "https.www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    
+    // NEW: Import Firestore functions
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      serverTimestamp 
+    } from "https.www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     // YOUR FIREBASE CONFIGURATION OBJECT
     const firebaseConfig = {
@@ -436,10 +428,12 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app); // NEW: Initialize Firestore
     const googleProvider = new GoogleAuthProvider();
     
-    // --- UI Elements for Toggling ---
+    // --- UI Elements ---
     const loginTitle = document.getElementById('login-title');
+    // ... (all other UI elements)
     const emailPassGroup = document.getElementById('email-pass-group');
     const googleBtnGroup = document.getElementById('google-btn-group');
     const showPhoneBtnGroup = document.getElementById('show-phone-btn-group');
@@ -450,72 +444,75 @@
     const cancelPhoneGroup = document.getElementById('cancel-phone-group');
     const recaptchaContainer = document.getElementById('recaptcha-container');
 
-    // --- Helper function to show/hide elements ---
+    // --- NEW: Helper function to create user document in Firestore ---
+    async function createUserDocument(user, name = null) {
+      const userRef = doc(db, "users", user.uid);
+      const data = {
+        uid: user.uid,
+        displayName: name || user.displayName || 'Unnamed User',
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        joinDate: serverTimestamp() // NEW: Records the join date
+      };
+      // Use setDoc with { merge: true } to create or update without overwriting
+      await setDoc(userRef, data, { merge: true });
+    }
+
+    // --- UI Toggle Function ---
     function togglePhoneUI(showPhone) {
-        // Show email/pass UI
         emailPassGroup.style.display = showPhone ? 'none' : 'block';
         googleBtnGroup.style.display = showPhone ? 'none' : 'block';
         showPhoneBtnGroup.style.display = showPhone ? 'none' : 'block';
         registerLinkGroup.style.display = showPhone ? 'none' : 'block';
-        
-        // Show phone UI
         phoneAuthGroup.style.display = showPhone ? 'block' : 'none';
         cancelPhoneGroup.style.display = showPhone ? 'block' : 'none';
-        
-        // Hide code UI
         codeAuthGroup.style.display = 'none';
-        
         loginTitle.textContent = showPhone ? 'Phone Sign-In' : 'Welcome Back';
-        
-        // Clear reCAPTCHA if we are hiding the phone UI
         if (!showPhone) {
             recaptchaContainer.innerHTML = '';
-            // Also clear any existing verifier instance
-            if (window.recaptchaVerifier) {
-                window.recaptchaVerifier.clear();
-            }
+            if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
         }
     }
 
     // --- Email/Password Registration ---
     document.getElementById('emailRegisterForm').addEventListener('submit', (e) => {
       e.preventDefault();
+      const name = e.target.name.value; // Get the name
       const email = e.target.email.value;
       const password = e.target.password.value;
       
       createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
           const user = userCredential.user;
+          // NEW: Update auth profile with name
+          await updateProfile(user, { displayName: name });
+          // NEW: Create user doc in Firestore
+          await createUserDocument(user, name); 
+          
           showToast('Registration successful! Please sign in.');
-          console.log('Registered user:', user);
-          // Flip back to login page
           container.classList.remove('active');
         })
         .catch((error) => {
           showToast(`Error: ${error.message}`);
-          console.error('Registration error:', error);
         });
     });
     
     // --- Email/Password Login ---
     document.getElementById('emailLoginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      // This check ensures we only fire if the email form is active
       if (emailPassGroup.style.display !== 'none') {
         const email = e.target.email.value;
         const password = e.target.password.value;
         
         signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            showToast(`Welcome back, ${user.email}!`);
-            console.log('Signed in user:', user);
-            // NEW: Redirect to home page
+          .then(async (userCredential) => {
+            // NEW: Ensure user doc exists
+            await createUserDocument(userCredential.user);
+            showToast(`Welcome back, ${userCredential.user.email}!`);
             window.location.href = "index.html"; 
           })
           .catch((error) => {
             showToast(`Error: ${error.message}`);
-            console.error('Login error:', error);
           });
       }
     });
@@ -523,30 +520,25 @@
     // --- Google Sign-In ---
     document.getElementById('googleLoginBtn').addEventListener('click', () => {
       signInWithPopup(auth, googleProvider)
-        .then((result) => {
+        .then(async (result) => {
           const user = result.user;
+          // NEW: Ensure user doc exists
+          await createUserDocument(user); 
           showToast(`Welcome, ${user.displayName}!`);
-          console.log("Google Sign-In Successful:", user);
-          // NEW: Redirect to home page
           window.location.href = "index.html";
         }).catch((error) => {
           if (error.code !== 'auth/popup-closed-by-user') {
             showToast(`Error: ${error.message}`);
           }
-          console.error("Google Sign-In Error:", error);
         });
     });
     
-    // --- Phone Sign-In: Step 1 (Show UI and reCAPTCHA) ---
+    // --- Phone Sign-In: Step 1 (Show UI) ---
     document.getElementById('showPhoneAuthBtn').addEventListener('click', () => {
         togglePhoneUI(true);
-        
-        // Setup reCAPTCHA
         window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
           'size': 'normal', 
-          'callback': (response) => {
-            console.log("reCAPTCHA solved");
-          },
+          'callback': (response) => {},
           'expired-callback': () => {
             showToast('reCAPTCHA expired. Please try again.');
           }
@@ -561,42 +553,32 @@
         
         signInWithPhoneNumber(auth, phoneNumber, appVerifier)
             .then((confirmationResult) => {
-              // SMS sent. Save confirmationResult to verify later.
               window.confirmationResult = confirmationResult;
               showToast('Verification code sent!');
-              // Show code input UI
               phoneAuthGroup.style.display = 'none';
               codeAuthGroup.style.display = 'block';
             }).catch((error) => {
               showToast(`Error: ${error.message}`);
-              console.error('SMS Send Error:', error);
-              // Reset reCAPTCHA
-              if (window.recaptchaVerifier) {
-                window.recaptchaVerifier.render();
-              }
+              if (window.recaptchaVerifier) window.recaptchaVerifier.render();
             });
     });
     
     // --- Phone Sign-In: Step 3 (Verify Code) ---
     document.getElementById('verifyCodeBtn').addEventListener('click', () => {
         const code = document.getElementById('verificationCode').value;
-        
         if (!window.confirmationResult) {
             showToast('Please send a code first.');
             return;
         }
 
-        window.confirmationResult.confirm(code).then((result) => {
-          // User signed in successfully.
-          const user = result.D;
+        window.confirmationResult.confirm(code).then(async (result) => {
+          const user = result.user;
+          // NEW: Ensure user doc exists
+          await createUserDocument(user);
           showToast(`Welcome, ${user.phoneNumber}!`);
-          console.log("Phone Sign-In Successful:", user);
-          // NEW: Redirect to home page
           window.location.href = "index.html";
         }).catch((error) => {
-          // Invalid code.
           showToast('Invalid verification code.');
-          console.error('Code Verification Error:', error);
         });
     });
     
